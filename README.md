@@ -1,1 +1,1 @@
-# feira-trocas-comunitaria-preojeto-Avanti
+# feira-trocas-comunitaria-projeto-Avanti
