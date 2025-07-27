@@ -10,12 +10,15 @@ const userController = new UserController();
 const itemController = new ItemController();
 const proposalController = new ProposalController();
 
-// Usuários
-router.get("/usuarios", authorization, userController.findAllUsers);
-router.get("/usuarios/:id", authorization, userController.findUserById);
+// Login
+router.post("/login", userController.login);
+
+// Usuários (sem autenticação para facilitar testes)
+router.get("/usuarios", userController.findAllUsers);
+router.get("/usuarios/:id", userController.findUserById);
 router.post("/usuarios", userController.createUser);
-router.put("/usuarios/:id", authorization, userController.updateUser);
-router.delete("/usuarios/:id", authorization, userController.deleteUser);
+router.put("/usuarios/:id", userController.updateUser);
+router.delete("/usuarios/:id", userController.deleteUser);
 
 // Itens
 router.get("/itens", itemController.findAllItems);

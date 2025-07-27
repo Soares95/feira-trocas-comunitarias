@@ -7,52 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       String     @id @default(uuid())
-  name     String
-  email    String     @unique
-  password String
-  items    Item[]     @relation("UserItems")
-  proposal Proposal[] @relation("ProposalsMade")
-
-  @@map("users")
+model items {
+  id                                       String      @id
+  name                                     String
+  description                              String
+  category                                 String
+  imageUrl                                 String?
+  ownerId                                  String
+  users                                    users       @relation(fields: [ownerId], references: [id])
+  proposals_proposals_desiredItemIdToitems proposals[] @relation("proposals_desiredItemIdToitems")
+  proposals_proposals_itemOfferedIdToitems proposals[] @relation("proposals_itemOfferedIdToitems")
 }
 
-model Item {
-  id                String     @id @default(uuid())
-  name              String
-  description       String
-  category          String
-  imageUrl          String?
-  ownerId           String
-  owner             User       @relation("UserItems", fields: [ownerId], references: [id])
-  proposalsOffered  Proposal[] @relation("ItemOffered")
-  proposalsReceived Proposal[] @relation("DesiredItem")
-
-  @@map("items")
+model proposals {
+  id                                   Int      @id @default(autoincrement())
+  itemOfferedId                        String
+  desiredItemId                        String
+  proponentId                          String
+  status                               status   @default(PENDING)
+  createdAt                            DateTime @default(now())
+  updatedAt                            DateTime
+  items_proposals_desiredItemIdToitems items    @relation("proposals_desiredItemIdToitems", fields: [desiredItemId], references: [id])
+  items_proposals_itemOfferedIdToitems items    @relation("proposals_itemOfferedIdToitems", fields: [itemOfferedId], references: [id])
+  users                                users    @relation(fields: [proponentId], references: [id])
 }
 
-model Proposal {
-  id             Int      @id @default(autoincrement())
-  itemOfferedId  String
-  desiredItemId  String
-  proponentId    String
-  status         Status   @default(PENDING)
-
-  itemOffered    Item     @relation("ItemOffered", fields: [itemOfferedId], references: [id])
-  desiredItem    Item     @relation("DesiredItem", fields: [desiredItemId], references: [id])
-  proponent      User     @relation("ProposalsMade", fields: [proponentId], references: [id])
-
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@map("proposals")
+model users {
+  id        String      @id
+  name      String
+  email     String      @unique
+  password  String
+  items     items[]
+  proposals proposals[]
 }
 
-enum Status {
+model usuarios {
+  id           Int       @id @default(autoincrement())
+  nome         String
+  email        String    @unique
+  senhahash    String
+  datacadastro DateTime? @default(now()) @db.Timestamp(6)
+}
+
+enum status {
   PENDING
   ACCEPTED
   REFUSED
-
-  @@map("status")
 }

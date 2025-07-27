@@ -1,9 +1,31 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
 export class UserController {
+  async login(request, response) {
+    const { email, password } = request.body;
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        return response.status(401).json({ error: "Invalid email or password" });
+      }
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return response.status(401).json({ error: "Invalid email or password" });
+      }
+      const token = jwt.sign(
+        { userId: user.id, isAdmin: user.isAdmin },
+        process.env.SECRET_JWT || "default_secret",
+        { expiresIn: "1d" }
+      );
+      return response.status(200).json({ token });
+    } catch (error) {
+      return response.status(500).json({ error: "Internal server error" });
+    }
+  }
   async findAllUsers(request, response) {
     try {
       const users = await prisma.user.findMany({
